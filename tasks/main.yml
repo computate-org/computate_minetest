@@ -1,0 +1,59 @@
+---
+- name: "Install dependencies: {{ APP_DEPENDENCIES | join(' ') }}"
+  shell: "pkcon install -y {{ item }} | true"
+  loop: "{{ APP_DEPENDENCIES }}"
+- name: "Create the directory {{ APP_SRC }}"
+  file:
+    name: "{{ APP_SRC }}"
+    state: directory
+- name: "Check for the README file {{ APP_README }}"
+  stat:
+    path: "{{ APP_README }}"
+  register: APP_README_PATH
+- name: "Clone the {{ APP_REPO }} source code into {{ APP_SRC }}"
+  git:
+    repo: "{{ APP_REPO }}"
+    dest: "{{ APP_SRC }}"
+    version: "{{ APP_TAG }}"
+  when: not APP_README_PATH.stat.exists
+- name: "Run the cmake script in {{ APP_SRC }}"
+  shell:
+    cmd: "cmake .  -DRUN_IN_PLACE=TRUE -DCMAKE_INSTALL_PREFIX={{ APP_PREFIX }}"
+    chdir: "{{ APP_SRC }}"
+- name: "Run the make script in {{ APP_SRC }}"
+  shell:
+    cmd: make
+    chdir: "{{ APP_SRC }}"
+- name: "Run the make install script in {{ APP_SRC }}"
+  shell:
+    cmd: make install
+    chdir: "{{ APP_SRC }}"
+- name: "Create the launcher {{ APP_DESKTOP }}"
+  template:
+    src: app.desktop
+    dest: "{{ APP_DESKTOP }}"
+
+###########
+# Plugins #
+###########
+
+- name: "Clone the Minetest Game game source code into {{ APP_SRC }}/games"
+  git:
+    repo: "git@github.com:minetest/minetest_game.git"
+    dest: "{{ APP_PREFIX }}/games/minetest_game"
+    version: "5.4.1"
+- name: "Clone the MineClone2 game source code into {{ APP_SRC }}/games"
+  git:
+    repo: "git@github.com:SonicTheCrafter/MineClone2.git"
+    dest: "{{ APP_PREFIX }}/games/MineClone2"
+- name: "Clone the Bountiful Blossoms Halcyon Days game source code into {{ APP_SRC }}/games"
+  git:
+    repo: "git@github.com:azekillDIABLO/Bountiful-Blossoms-Halcyon-Days.git"
+    dest: "{{ APP_PREFIX }}/games/Bountiful-Blossoms-Halcyon-Days"
+
+- name: "Clone the worldedit mod source code into {{ APP_SRC }}/mods"
+  git:
+    repo: "git@github.com:Uberi/Minetest-WorldEdit.git"
+    dest: "{{ APP_PREFIX }}/mods/Minetest-WorldEdit-1.3"
+    version: "1.3"
+
