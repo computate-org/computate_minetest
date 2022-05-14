@@ -1,3 +1,10 @@
+
+# Install prerequisites
+
+Install this Ansible role: 
+
+https://github.com/computate-org/computate_luajit
+
 # Install minetest
 
 ## Install the latest Python and setup a new Python virtualenv
