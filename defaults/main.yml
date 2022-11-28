@@ -5,11 +5,12 @@ APP_DEPENDENCIES_REDHAT:
   - gmp-devel
   - luajit
   - openal-soft
-  - sqlite-soft
+  - sqlite
   - sqlite-devel
   - libjpeg-turbo-devel
   - bzip2-devel
   - openal-devel
+  - libvorbis-devel
   - doxygen
   - postgresql-devel
 APP_PREFIX: "{{ lookup('env', 'HOME') }}/.local"

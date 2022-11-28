@@ -1,7 +1,16 @@
 ---
-- name: "Install dependencies: {{ APP_DEPENDENCIES | join(' ') }}"
+- include_role:
+    name: computate.computate_luajit
+- name: "Install dependencies as root: {{ APP_DEPENDENCIES | join(' ') }}"
+  package:
+    name: "{{ APP_DEPENDENCIES }}"
+  become: true
+  register: INSTALL_DEPENDENCIES
+  ignore_errors: true
+- name: "Install dependencies as user {{ APP_USER }}: {{ APP_DEPENDENCIES | join(' ') }}"
   shell: "pkcon install -y {{ item }} | true"
   loop: "{{ APP_DEPENDENCIES }}"
+  when: INSTALL_DEPENDENCIES.failed
 
 # irrlicht dependency
 - name: "Check for the README file {{ IRRLICHT_README }}"
@@ -50,9 +59,9 @@
   shell:
     cmd: make -j $(nproc)
     chdir: "{{ APP_SRC }}"
-- name: "Run the make install script in {{ APP_SRC }}"
+- name: "Run the make install script in {{ APP_SRC }}: make install -j $(nproc)"
   shell:
-    cmd: make install
+    cmd: make install -j $(nproc)
     chdir: "{{ APP_SRC }}"
 - name: "Create the launcher {{ APP_DESKTOP }}"
   template:
