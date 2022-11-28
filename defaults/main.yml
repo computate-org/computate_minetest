@@ -12,18 +12,24 @@ APP_DEPENDENCIES_REDHAT:
   - openal-devel
   - doxygen
   - postgresql-devel
+APP_PREFIX: "{{ lookup('env', 'HOME') }}/.local"
 APP_DEPENDENCIES: "{{ APP_DEPENDENCIES_REDHAT if ansible_distribution_file_variety == 'RedHat' else APP_DEPENDENCIES_REDHAT }}"
+
+IRRLICHT_SRC: "{{ APP_PREFIX }}/src/irrlicht"
+IRRLICHT_REPO: git@github.com:minetest/irrlicht.git
+IRRLICHT_TAG: 1.9.0mt8
+IRRLICHT_README: "{{ IRRLICHT_SRC }}/README.md"
+
 APP_NAME: minetest
 APP_DISPLAY_NAME: Minetest
 APP_GENERIC_NAME: A minecraft type game
 APP_COMMENT: Mining blocks
 APP_USER: "{{ lookup('env', 'USER') }}"
 APP_GROUP: "{{ APP_USER }}"
-APP_PREFIX: "{{ lookup('env', 'HOME') }}/.local"
 APP_SRC: "{{ APP_PREFIX }}/src/minetest"
 APP_SHARE: "{{ APP_PREFIX }}/share/{{ APP_NAME  }}"
 APP_REPO: git@github.com:minetest/minetest.git
-APP_TAG: 5.4.1
+APP_TAG: 5.6.1
 APP_DESKTOP: "{{ lookup('env', 'HOME') }}/.local/share/applications/{{ APP_NAME }}.desktop"
 APP_README: "{{ APP_SRC }}/README.md"
 APP_ICON: "{{ APP_PREFIX }}/unix/icons/hicolor/scalable/apps/minetest.svg"

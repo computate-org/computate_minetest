@@ -2,6 +2,32 @@
 - name: "Install dependencies: {{ APP_DEPENDENCIES | join(' ') }}"
   shell: "pkcon install -y {{ item }} | true"
   loop: "{{ APP_DEPENDENCIES }}"
+
+# irrlicht dependency
+- name: "Check for the README file {{ IRRLICHT_README }}"
+  stat:
+    path: "{{ IRRLICHT_README }}"
+  register: IRRLICHT_README_PATH
+- name: "Clone the {{ IRRLICHT_REPO }} source code into {{ IRRLICHT_SRC }}"
+  git:
+    repo: "{{ IRRLICHT_REPO }}"
+    dest: "{{ IRRLICHT_SRC }}"
+    version: "{{ IRRLICHT_TAG }}"
+  when: not IRRLICHT_README_PATH.stat.exists
+- name: "Run the cmake script in {{ IRRLICHT_SRC }}"
+  shell:
+    cmd: "cmake .  -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX={{ APP_PREFIX }}"
+    chdir: "{{ IRRLICHT_SRC }}"
+- name: "Run the make script in {{ IRRLICHT_SRC }}: make -j $(nproc)"
+  shell:
+    cmd: make -j $(nproc)
+    chdir: "{{ IRRLICHT_SRC }}"
+- name: "Run the make install script in {{ IRRLICHT_SRC }}"
+  shell:
+    cmd: make install
+    chdir: "{{ IRRLICHT_SRC }}"
+
+# minetest
 - name: "Create the directory {{ APP_SRC }}"
   file:
     name: "{{ APP_SRC }}"
@@ -20,9 +46,9 @@
   shell:
     cmd: "cmake .  -DRUN_IN_PLACE=TRUE -DCMAKE_INSTALL_PREFIX={{ APP_PREFIX }}"
     chdir: "{{ APP_SRC }}"
-- name: "Run the make script in {{ APP_SRC }}"
+- name: "Run the make script in {{ APP_SRC }}: make -j $(nproc)"
   shell:
-    cmd: make
+    cmd: make -j $(nproc)
     chdir: "{{ APP_SRC }}"
 - name: "Run the make install script in {{ APP_SRC }}"
   shell:
